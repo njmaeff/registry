@@ -1,0 +1,725 @@
+/* eslint-disable */
+module.exports = {
+   name: "@njmaeff/yarn-plugin-essentials",
+   factory: function (__BERRY_REQUIRE__) {
+       var plugin =
+/******/ (function(modules) { // webpackBootstrap
+/******/ 	// The module cache
+/******/ 	var installedModules = {};
+/******/
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/
+/******/ 		// Check if module is in cache
+/******/ 		if(installedModules[moduleId]) {
+/******/ 			return installedModules[moduleId].exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = installedModules[moduleId] = {
+/******/ 			i: moduleId,
+/******/ 			l: false,
+/******/ 			exports: {}
+/******/ 		};
+/******/
+/******/ 		// Execute the module function
+/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/******/
+/******/ 		// Flag the module as loaded
+/******/ 		module.l = true;
+/******/
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/
+/******/
+/******/ 	// expose the modules object (__webpack_modules__)
+/******/ 	__webpack_require__.m = modules;
+/******/
+/******/ 	// expose the module cache
+/******/ 	__webpack_require__.c = installedModules;
+/******/
+/******/ 	// define getter function for harmony exports
+/******/ 	__webpack_require__.d = function(exports, name, getter) {
+/******/ 		if(!__webpack_require__.o(exports, name)) {
+/******/ 			Object.defineProperty(exports, name, { enumerable: true, get: getter });
+/******/ 		}
+/******/ 	};
+/******/
+/******/ 	// define __esModule on exports
+/******/ 	__webpack_require__.r = function(exports) {
+/******/ 		if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 			Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 		}
+/******/ 		Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 	};
+/******/
+/******/ 	// create a fake namespace object
+/******/ 	// mode & 1: value is a module id, require it
+/******/ 	// mode & 2: merge all properties of value into the ns
+/******/ 	// mode & 4: return value when already ns object
+/******/ 	// mode & 8|1: behave like require
+/******/ 	__webpack_require__.t = function(value, mode) {
+/******/ 		if(mode & 1) value = __webpack_require__(value);
+/******/ 		if(mode & 8) return value;
+/******/ 		if((mode & 4) && typeof value === 'object' && value && value.__esModule) return value;
+/******/ 		var ns = Object.create(null);
+/******/ 		__webpack_require__.r(ns);
+/******/ 		Object.defineProperty(ns, 'default', { enumerable: true, value: value });
+/******/ 		if(mode & 2 && typeof value != 'string') for(var key in value) __webpack_require__.d(ns, key, function(key) { return value[key]; }.bind(null, key));
+/******/ 		return ns;
+/******/ 	};
+/******/
+/******/ 	// getDefaultExport function for compatibility with non-harmony modules
+/******/ 	__webpack_require__.n = function(module) {
+/******/ 		var getter = module && module.__esModule ?
+/******/ 			function getDefault() { return module['default']; } :
+/******/ 			function getModuleExports() { return module; };
+/******/ 		__webpack_require__.d(getter, 'a', getter);
+/******/ 		return getter;
+/******/ 	};
+/******/
+/******/ 	// Object.prototype.hasOwnProperty.call
+/******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
+/******/
+/******/ 	// __webpack_public_path__
+/******/ 	__webpack_require__.p = "";
+/******/
+/******/
+/******/ 	// Load entry module and return exports
+/******/ 	return __webpack_require__(__webpack_require__.s = "./plugin.ts");
+/******/ })
+/************************************************************************/
+/******/ ({
+
+/***/ "../../node_modules/ci-info/index.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var vendors = __webpack_require__("../../node_modules/ci-info/vendors.json")
+
+var env = process.env
+
+// Used for testing only
+Object.defineProperty(exports, '_vendors', {
+  value: vendors.map(function (v) { return v.constant })
+})
+
+exports.name = null
+exports.isPR = null
+
+vendors.forEach(function (vendor) {
+  var envs = Array.isArray(vendor.env) ? vendor.env : [vendor.env]
+  var isCI = envs.every(function (obj) {
+    return checkEnv(obj)
+  })
+
+  exports[vendor.constant] = isCI
+
+  if (isCI) {
+    exports.name = vendor.name
+
+    switch (typeof vendor.pr) {
+      case 'string':
+        // "pr": "CIRRUS_PR"
+        exports.isPR = !!env[vendor.pr]
+        break
+      case 'object':
+        if ('env' in vendor.pr) {
+          // "pr": { "env": "BUILDKITE_PULL_REQUEST", "ne": "false" }
+          exports.isPR = vendor.pr.env in env && env[vendor.pr.env] !== vendor.pr.ne
+        } else if ('any' in vendor.pr) {
+          // "pr": { "any": ["ghprbPullId", "CHANGE_ID"] }
+          exports.isPR = vendor.pr.any.some(function (key) {
+            return !!env[key]
+          })
+        } else {
+          // "pr": { "DRONE_BUILD_EVENT": "pull_request" }
+          exports.isPR = checkEnv(vendor.pr)
+        }
+        break
+      default:
+        // PR detection not supported for this vendor
+        exports.isPR = null
+    }
+  }
+})
+
+exports.isCI = !!(
+  env.CI || // Travis CI, CircleCI, Cirrus CI, Gitlab CI, Appveyor, CodeShip, dsari
+  env.CONTINUOUS_INTEGRATION || // Travis CI, Cirrus CI
+  env.BUILD_NUMBER || // Jenkins, TeamCity
+  env.RUN_ID || // TaskCluster, dsari
+  exports.name ||
+  false
+)
+
+function checkEnv (obj) {
+  if (typeof obj === 'string') return !!env[obj]
+  return Object.keys(obj).every(function (k) {
+    return env[k] === obj[k]
+  })
+}
+
+
+/***/ }),
+
+/***/ "../../node_modules/ci-info/vendors.json":
+/***/ (function(module) {
+
+module.exports = JSON.parse("[{\"name\":\"AppVeyor\",\"constant\":\"APPVEYOR\",\"env\":\"APPVEYOR\",\"pr\":\"APPVEYOR_PULL_REQUEST_NUMBER\"},{\"name\":\"Azure Pipelines\",\"constant\":\"AZURE_PIPELINES\",\"env\":\"SYSTEM_TEAMFOUNDATIONCOLLECTIONURI\",\"pr\":\"SYSTEM_PULLREQUEST_PULLREQUESTID\"},{\"name\":\"Bamboo\",\"constant\":\"BAMBOO\",\"env\":\"bamboo_planKey\"},{\"name\":\"Bitbucket Pipelines\",\"constant\":\"BITBUCKET\",\"env\":\"BITBUCKET_COMMIT\",\"pr\":\"BITBUCKET_PR_ID\"},{\"name\":\"Bitrise\",\"constant\":\"BITRISE\",\"env\":\"BITRISE_IO\",\"pr\":\"BITRISE_PULL_REQUEST\"},{\"name\":\"Buddy\",\"constant\":\"BUDDY\",\"env\":\"BUDDY_WORKSPACE_ID\",\"pr\":\"BUDDY_EXECUTION_PULL_REQUEST_ID\"},{\"name\":\"Buildkite\",\"constant\":\"BUILDKITE\",\"env\":\"BUILDKITE\",\"pr\":{\"env\":\"BUILDKITE_PULL_REQUEST\",\"ne\":\"false\"}},{\"name\":\"CircleCI\",\"constant\":\"CIRCLE\",\"env\":\"CIRCLECI\",\"pr\":\"CIRCLE_PULL_REQUEST\"},{\"name\":\"Cirrus CI\",\"constant\":\"CIRRUS\",\"env\":\"CIRRUS_CI\",\"pr\":\"CIRRUS_PR\"},{\"name\":\"AWS CodeBuild\",\"constant\":\"CODEBUILD\",\"env\":\"CODEBUILD_BUILD_ARN\"},{\"name\":\"Codeship\",\"constant\":\"CODESHIP\",\"env\":{\"CI_NAME\":\"codeship\"}},{\"name\":\"Drone\",\"constant\":\"DRONE\",\"env\":\"DRONE\",\"pr\":{\"DRONE_BUILD_EVENT\":\"pull_request\"}},{\"name\":\"dsari\",\"constant\":\"DSARI\",\"env\":\"DSARI\"},{\"name\":\"GitLab CI\",\"constant\":\"GITLAB\",\"env\":\"GITLAB_CI\"},{\"name\":\"GoCD\",\"constant\":\"GOCD\",\"env\":\"GO_PIPELINE_LABEL\"},{\"name\":\"Hudson\",\"constant\":\"HUDSON\",\"env\":\"HUDSON_URL\"},{\"name\":\"Jenkins\",\"constant\":\"JENKINS\",\"env\":[\"JENKINS_URL\",\"BUILD_ID\"],\"pr\":{\"any\":[\"ghprbPullId\",\"CHANGE_ID\"]}},{\"name\":\"Magnum CI\",\"constant\":\"MAGNUM\",\"env\":\"MAGNUM\"},{\"name\":\"Netlify CI\",\"constant\":\"NETLIFY\",\"env\":\"NETLIFY_BUILD_BASE\",\"pr\":{\"env\":\"PULL_REQUEST\",\"ne\":\"false\"}},{\"name\":\"Sail CI\",\"constant\":\"SAIL\",\"env\":\"SAILCI\",\"pr\":\"SAIL_PULL_REQUEST_NUMBER\"},{\"name\":\"Semaphore\",\"constant\":\"SEMAPHORE\",\"env\":\"SEMAPHORE\",\"pr\":\"PULL_REQUEST_NUMBER\"},{\"name\":\"Shippable\",\"constant\":\"SHIPPABLE\",\"env\":\"SHIPPABLE\",\"pr\":{\"IS_PULL_REQUEST\":\"true\"}},{\"name\":\"Solano CI\",\"constant\":\"SOLANO\",\"env\":\"TDDIUM\",\"pr\":\"TDDIUM_PR_ID\"},{\"name\":\"Strider CD\",\"constant\":\"STRIDER\",\"env\":\"STRIDER\"},{\"name\":\"TaskCluster\",\"constant\":\"TASKCLUSTER\",\"env\":[\"TASK_ID\",\"RUN_ID\"]},{\"name\":\"TeamCity\",\"constant\":\"TEAMCITY\",\"env\":\"TEAMCITY_VERSION\"},{\"name\":\"Travis CI\",\"constant\":\"TRAVIS\",\"env\":\"TRAVIS\",\"pr\":{\"env\":\"TRAVIS_PULL_REQUEST\",\"ne\":\"false\"}}]");
+
+/***/ }),
+
+/***/ "./commands/install.ts":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.BareInstallCommand = void 0;
+
+var _cli = __webpack_require__("@yarnpkg/cli");
+
+var _core = __webpack_require__("@yarnpkg/core");
+
+var _fslib = __webpack_require__("@yarnpkg/fslib");
+
+var _parsers = __webpack_require__("@yarnpkg/parsers");
+
+var _ciInfo = __webpack_require__("../../node_modules/ci-info/index.js");
+
+var _clipanion = __webpack_require__("clipanion");
+
+var _dec, _dec2, _dec3, _dec4, _dec5, _dec6, _dec7, _dec8, _dec9, _dec10, _dec11, _dec12, _dec13, _dec14, _class, _descriptor, _descriptor2, _descriptor3, _descriptor4, _descriptor5, _descriptor6, _descriptor7, _descriptor8, _descriptor9, _descriptor10, _descriptor11, _descriptor12, _descriptor13, _class2, _temp;
+
+function _initializerDefineProperty(target, property, descriptor, context) { if (!descriptor) return; Object.defineProperty(target, property, { enumerable: descriptor.enumerable, configurable: descriptor.configurable, writable: descriptor.writable, value: descriptor.initializer ? descriptor.initializer.call(context) : void 0 }); }
+
+function _applyDecoratedDescriptor(target, property, decorators, descriptor, context) { var desc = {}; Object.keys(descriptor).forEach(function (key) { desc[key] = descriptor[key]; }); desc.enumerable = !!desc.enumerable; desc.configurable = !!desc.configurable; if ('value' in desc || desc.initializer) { desc.writable = true; } desc = decorators.slice().reverse().reduce(function (desc, decorator) { return decorator(target, property, desc) || desc; }, desc); if (context && desc.initializer !== void 0) { desc.value = desc.initializer ? desc.initializer.call(context) : void 0; desc.initializer = undefined; } if (desc.initializer === void 0) { Object.defineProperty(target, property, desc); desc = null; } return desc; }
+
+function _initializerWarningHelper(descriptor, context) { throw new Error('Decorating class property failed. Please ensure that ' + 'proposal-class-properties is enabled and runs after the decorators transform.'); }
+
+let BareInstallCommand = (_dec = _clipanion.Command.Boolean(`--json`, {
+  description: `Format the output as an NDJSON stream`
+}), _dec2 = _clipanion.Command.Boolean(`--immutable`, {
+  description: `Abort with an error exit code if the lockfile was to be modified`
+}), _dec3 = _clipanion.Command.Boolean(`--immutable-cache`, {
+  description: `Abort with an error exit code if the cache folder was to be modified`
+}), _dec4 = _clipanion.Command.Boolean(`--check-cache`, {
+  description: `Always refetch the packages and ensure that their checksums are consistent`
+}), _dec5 = _clipanion.Command.Boolean(`--production`, {
+  hidden: true
+}), _dec6 = _clipanion.Command.Boolean(`--non-interactive`, {
+  hidden: true
+}), _dec7 = _clipanion.Command.Boolean(`--frozen-lockfile`, {
+  hidden: true
+}), _dec8 = _clipanion.Command.Boolean(`--prefer-offline`, {
+  hidden: true
+}), _dec9 = _clipanion.Command.Boolean(`--ignore-engines`, {
+  hidden: true
+}), _dec10 = _clipanion.Command.String(`--registry`, {
+  hidden: true
+}), _dec11 = _clipanion.Command.Boolean(`--skip-builds`, {
+  description: `Skip the build step altogether`
+}), _dec12 = _clipanion.Command.String(`--cache-folder`, {
+  hidden: true
+}), _dec13 = _clipanion.Command.Boolean(`--silent`, {
+  hidden: true
+}), _dec14 = _clipanion.Command.Path(`bare`, `install`), (_class = (_temp = _class2 = class BareInstallCommand extends _cli.BaseCommand {
+  constructor(...args) {
+    super(...args);
+
+    _initializerDefineProperty(this, "json", _descriptor, this);
+
+    _initializerDefineProperty(this, "immutable", _descriptor2, this);
+
+    _initializerDefineProperty(this, "immutableCache", _descriptor3, this);
+
+    _initializerDefineProperty(this, "checkCache", _descriptor4, this);
+
+    _initializerDefineProperty(this, "production", _descriptor5, this);
+
+    _initializerDefineProperty(this, "nonInteractive", _descriptor6, this);
+
+    _initializerDefineProperty(this, "frozenLockfile", _descriptor7, this);
+
+    _initializerDefineProperty(this, "preferOffline", _descriptor8, this);
+
+    _initializerDefineProperty(this, "ignoreEngines", _descriptor9, this);
+
+    _initializerDefineProperty(this, "registry", _descriptor10, this);
+
+    _initializerDefineProperty(this, "skipBuilds", _descriptor11, this);
+
+    _initializerDefineProperty(this, "cacheFolder", _descriptor12, this);
+
+    _initializerDefineProperty(this, "silent", _descriptor13, this);
+  }
+
+  async execute() {
+    var _configuration$get, _ref, _this$immutable;
+
+    const configuration = await _core.Configuration.find(this.context.cwd, this.context.plugins, {
+      strict: false
+    });
+    const isZeitNow = !!process.env.NOW_BUILDER;
+    const isNetlify = !!process.env.NETLIFY; // These variables are used in Google Cloud Platform environment
+    // in process of deploying Google Cloud Functions and
+    // Google App Engine
+
+    const isGCP = !!process.env.FUNCTION_TARGET || !!process.env.GOOGLE_RUNTIME;
+
+    const reportDeprecation = async (message, {
+      error
+    }) => {
+      const deprecationReport = await _core.StreamReport.start({
+        configuration,
+        stdout: this.context.stdout,
+        includeFooter: false
+      }, async report => {
+        if (error) {
+          report.reportError(_core.MessageName.DEPRECATED_CLI_SETTINGS, message);
+        } else {
+          report.reportWarning(_core.MessageName.DEPRECATED_CLI_SETTINGS, message);
+        }
+      });
+
+      if (deprecationReport.hasErrors()) {
+        return deprecationReport.exitCode();
+      } else {
+        return null;
+      }
+    }; // The ignoreEngines flag isn't implemented at the moment. I'm still
+    // considering how it should work in the context of plugins - would it
+    // make sense to allow them (or direct dependencies) to define new
+    // "engine check"? Since it has implications regarding the
+    // architecture,
+    // I prefer to postpone the decision to later. Also it wouldn't be a
+    // flag, it would definitely be a configuration setting.
+
+
+    if (typeof this.ignoreEngines !== `undefined`) {
+      const exitCode = await reportDeprecation(`The --ignore-engines option is deprecated; engine checking isn't a core feature anymore`, {
+        error: !isZeitNow
+      });
+
+      if (exitCode !== null) {
+        return exitCode;
+      }
+    } // The registry flag isn't supported anymore because it makes little
+    // sense to use a registry for a single install. You instead want to
+    // configure it for all installs inside a project, so through the
+    // .yarnrc.yml file. Note that if absolutely necessary, the old
+    // behavior can be emulated by adding the YARN_NPM_REGISTRY_SERVER
+    // variable to the environment.
+
+
+    if (typeof this.registry !== `undefined`) {
+      const exitCode = await reportDeprecation(`The --registry option is deprecated; prefer setting npmRegistryServer in your .yarnrc.yml file`, {
+        error: false
+      });
+
+      if (exitCode !== null) {
+        return exitCode;
+      }
+    } // The preferOffline flag doesn't make much sense with our
+    // architecture.
+    // It would require the fetchers to also act as resolvers, which is
+    // doable but quirky. Since a similar behavior is available via the
+    // --cached flag in yarn add, I prefer to move it outside of the core
+    // and let someone implement this "resolver-that-reads-the-cache"
+    // logic.
+
+
+    if (typeof this.preferOffline !== `undefined`) {
+      const exitCode = await reportDeprecation(`The --prefer-offline flag is deprecated; use the --cached flag with 'yarn add' instead`, {
+        error: !isZeitNow
+      });
+
+      if (exitCode !== null) {
+        return exitCode;
+      }
+    } // Since the production flag would yield a different lockfile than the
+    // regular installs, it's not part of the regular `install` command
+    // anymore. Instead, we expect users to use it with `yarn workspaces
+    // focus` (which can be used even outside of monorepos).
+
+
+    if (typeof this.production !== `undefined`) {
+      const exitCode = await reportDeprecation(`The --production option is deprecated on 'install'; use 'yarn workspaces focus' instead`, {
+        error: true
+      });
+
+      if (exitCode !== null) {
+        return exitCode;
+      }
+    } // Yarn 2 isn't interactive during installs anyway, so there's no real
+    // point to this flag at the moment.
+
+
+    if (typeof this.nonInteractive !== `undefined`) {
+      const exitCode = await reportDeprecation(`The --non-interactive option is deprecated`, {
+        error: !isGCP
+      });
+
+      if (exitCode !== null) {
+        return exitCode;
+      }
+    } // We want to prevent people from using --frozen-lockfile
+    // Note: it's been deprecated because we're now locking more than just
+    // the lockfile - for example the PnP artifacts will also be locked.
+
+
+    if (typeof this.frozenLockfile !== `undefined`) {
+      const exitCode = await reportDeprecation(`The --frozen-lockfile option is deprecated; use --immutable and/or --immutable-cache instead`, {
+        error: !isGCP && !_ciInfo.TRAVIS
+      });
+
+      if (exitCode !== null) {
+        return exitCode;
+      }
+    } // We also want to prevent them from using --cache-folder
+    // Note: it's been deprecated because the cache folder should be set
+    // from the settings. Otherwise there would be a very high chance that
+    // multiple Yarn commands would use different caches, causing
+    // unexpected behaviors.
+
+
+    if (typeof this.cacheFolder !== `undefined`) {
+      const exitCode = await reportDeprecation(`The cache-folder option has been deprecated; use rc settings instead`, {
+        error: !isNetlify
+      });
+
+      if (exitCode !== null) {
+        return exitCode;
+      }
+    }
+
+    const immutable = typeof this.immutable === `undefined` && typeof this.frozenLockfile === `undefined` ? (_configuration$get = configuration.get(`enableImmutableInstalls`)) !== null && _configuration$get !== void 0 ? _configuration$get : false : (_ref = (_this$immutable = this.immutable) !== null && _this$immutable !== void 0 ? _this$immutable : this.frozenLockfile) !== null && _ref !== void 0 ? _ref : false;
+
+    if (configuration.projectCwd !== null) {
+      const fixReport = await _core.StreamReport.start({
+        configuration,
+        json: this.json,
+        stdout: this.context.stdout,
+        includeFooter: false
+      }, async report => {
+        if (await autofixMergeConflicts(configuration, immutable)) {
+          report.reportInfo(_core.MessageName.AUTOMERGE_SUCCESS, `Automatically fixed merge conflicts 👍`);
+          report.reportSeparator();
+        }
+      });
+
+      if (fixReport.hasErrors()) {
+        return fixReport.exitCode();
+      }
+    }
+
+    if (configuration.projectCwd !== null) {
+      const telemetryReport = await _core.StreamReport.start({
+        configuration,
+        json: this.json,
+        stdout: this.context.stdout,
+        includeFooter: false
+      }, async report => {
+        var _Configuration$teleme;
+
+        if ((_Configuration$teleme = _core.Configuration.telemetry) === null || _Configuration$teleme === void 0 ? void 0 : _Configuration$teleme.isNew) {
+          report.reportInfo(_core.MessageName.TELEMETRY_NOTICE, `Yarn will periodically gather anonymous telemetry: https://yarnpkg.com/advanced/telemetry`);
+          report.reportInfo(_core.MessageName.TELEMETRY_NOTICE, `Run ${_core.formatUtils.pretty(configuration, `yarn config set --home enableTelemetry 0`, _core.formatUtils.Type.CODE)} to disable`);
+          report.reportSeparator();
+        }
+      });
+
+      if (telemetryReport.hasErrors()) {
+        return telemetryReport.exitCode();
+      }
+    }
+
+    const {
+      project,
+      workspace
+    } = await _core.Project.find(configuration, this.context.cwd);
+    const cache = await _core.Cache.find(configuration, {
+      immutable: this.immutableCache,
+      check: this.checkCache
+    });
+    if (!workspace) throw new _cli.WorkspaceRequiredError(project.cwd, this.context.cwd);
+    await project.restoreInstallState({
+      restoreResolutions: false
+    }); // Important: Because other commands also need to run installs, if you
+    // get in a situation where you need to change this file in order to
+    // customize the install it's very likely you're doing something wrong.
+    // This file should stay super super simple, and the configuration and
+    // install logic should be implemented elsewhere (probably in either of
+    // the Configuration and Install classes). Feel free to open an issue
+    // in order to ask for design feedback before writing features.
+
+    const report = await _core.StreamReport.start({
+      configuration,
+      json: this.json,
+      stdout: this.context.stdout,
+      includeLogs: true
+    }, async report => {
+      await project.install({
+        cache,
+        report,
+        immutable,
+        skipBuild: this.skipBuilds
+      });
+    });
+    return report.exitCode();
+  }
+
+}, _class2.usage = _clipanion.Command.Usage({
+  description: `install the project dependencies`,
+  details: `
+      This command setup your project if needed. The installation is split in four different steps that each have their own characteristics:
+
+      - **Resolution:** First the package manager will resolve your dependencies. The exact way a dependency version is privileged over another isn't standardized outside of the regular semver guarantees. If a package doesn't resolve to what you would expect, check that all dependencies are correctly declared (also check our website for more information: ).
+
+      - **Fetch:** Then we download all the dependencies if needed, and make sure that they're all stored within our cache (check the value of \`cacheFolder\` in \`yarn config\` to see where are stored the cache files).
+
+      - **Link:** Then we send the dependency tree information to internal plugins tasked from writing them on the disk in some form (for example by generating the .pnp.js file you might know).
+
+      - **Build:** Once the dependency tree has been written on the disk, the package manager will now be free to run the build scripts for all packages that might need it, in a topological order compatible with the way they depend on one another.
+
+      Note that running this command is not part of the recommended workflow. Yarn supports zero-installs, which means that as long as you store your cache and your .pnp.js file inside your repository, everything will work without requiring any install right after cloning your repository or switching branches.
+
+      If the \`--immutable\` option is set, Yarn will abort with an error exit code if the lockfile was to be modified (other paths can be added using the \`immutablePaths\` configuration setting). For backward compatibility we offer an alias under the name of \`--frozen-lockfile\`, but it will be removed in a later release.
+
+      If the \`--immutable-cache\` option is set, Yarn will abort with an error exit code if the cache folder was to be modified (either because files would be added, or because they'd be removed).
+
+      If the \`--check-cache\` option is set, Yarn will always refetch the packages and will ensure that their checksum matches what's 1/ described in the lockfile 2/ inside the existing cache files (if present). This is recommended as part of your CI workflow if you're both following the Zero-Installs model and accepting PRs from third-parties, as they'd otherwise have the ability to alter the checked-in packages before submitting them.
+
+      If the \`--inline-builds\` option is set, Yarn will verbosely print the output of the build steps of your dependencies (instead of writing them into individual files). This is likely useful mostly for debug purposes only when using Docker-like environments.
+
+      If the \`--skip-builds\` option is set, Yarn will not run the build scripts at all. Note that this is different from setting \`enableScripts\` to false because the later will disable build scripts, and thus affect the content of the artifacts generated on disk, whereas the former will just disable the build step - but not the scripts themselves, which just won't run.
+    `,
+  examples: [[`Install the project`, `$0 install`], [`Validate a project when using Zero-Installs`, `$0 install --immutable --immutable-cache`], [`Validate a project when using Zero-Installs (slightly safer if you accept external PRs)`, `$0 install --immutable --immutable-cache --check-cache`]]
+}), _temp), (_descriptor = _applyDecoratedDescriptor(_class.prototype, "json", [_dec], {
+  configurable: true,
+  enumerable: true,
+  writable: true,
+  initializer: function () {
+    return false;
+  }
+}), _descriptor2 = _applyDecoratedDescriptor(_class.prototype, "immutable", [_dec2], {
+  configurable: true,
+  enumerable: true,
+  writable: true,
+  initializer: null
+}), _descriptor3 = _applyDecoratedDescriptor(_class.prototype, "immutableCache", [_dec3], {
+  configurable: true,
+  enumerable: true,
+  writable: true,
+  initializer: null
+}), _descriptor4 = _applyDecoratedDescriptor(_class.prototype, "checkCache", [_dec4], {
+  configurable: true,
+  enumerable: true,
+  writable: true,
+  initializer: function () {
+    return false;
+  }
+}), _descriptor5 = _applyDecoratedDescriptor(_class.prototype, "production", [_dec5], {
+  configurable: true,
+  enumerable: true,
+  writable: true,
+  initializer: null
+}), _descriptor6 = _applyDecoratedDescriptor(_class.prototype, "nonInteractive", [_dec6], {
+  configurable: true,
+  enumerable: true,
+  writable: true,
+  initializer: null
+}), _descriptor7 = _applyDecoratedDescriptor(_class.prototype, "frozenLockfile", [_dec7], {
+  configurable: true,
+  enumerable: true,
+  writable: true,
+  initializer: null
+}), _descriptor8 = _applyDecoratedDescriptor(_class.prototype, "preferOffline", [_dec8], {
+  configurable: true,
+  enumerable: true,
+  writable: true,
+  initializer: null
+}), _descriptor9 = _applyDecoratedDescriptor(_class.prototype, "ignoreEngines", [_dec9], {
+  configurable: true,
+  enumerable: true,
+  writable: true,
+  initializer: null
+}), _descriptor10 = _applyDecoratedDescriptor(_class.prototype, "registry", [_dec10], {
+  configurable: true,
+  enumerable: true,
+  writable: true,
+  initializer: null
+}), _descriptor11 = _applyDecoratedDescriptor(_class.prototype, "skipBuilds", [_dec11], {
+  configurable: true,
+  enumerable: true,
+  writable: true,
+  initializer: function () {
+    return false;
+  }
+}), _descriptor12 = _applyDecoratedDescriptor(_class.prototype, "cacheFolder", [_dec12], {
+  configurable: true,
+  enumerable: true,
+  writable: true,
+  initializer: null
+}), _descriptor13 = _applyDecoratedDescriptor(_class.prototype, "silent", [_dec13], {
+  configurable: true,
+  enumerable: true,
+  writable: true,
+  initializer: function () {
+    return false;
+  }
+}), _applyDecoratedDescriptor(_class.prototype, "execute", [_dec14], Object.getOwnPropertyDescriptor(_class.prototype, "execute"), _class.prototype)), _class));
+exports.BareInstallCommand = BareInstallCommand;
+const MERGE_CONFLICT_ANCESTOR = `|||||||`;
+const MERGE_CONFLICT_END = `>>>>>>>`;
+const MERGE_CONFLICT_SEP = `=======`;
+const MERGE_CONFLICT_START = `<<<<<<<`;
+
+async function autofixMergeConflicts(configuration, immutable) {
+  if (!configuration.projectCwd) return false;
+
+  const lockfilePath = _fslib.ppath.join(configuration.projectCwd, configuration.get(`lockfileFilename`));
+
+  if (!(await _fslib.xfs.existsPromise(lockfilePath))) return false;
+  const file = await _fslib.xfs.readFilePromise(lockfilePath, `utf8`);
+  if (!file.includes(MERGE_CONFLICT_START)) return false;
+  if (immutable) throw new _core.ReportError(_core.MessageName.AUTOMERGE_IMMUTABLE, `Cannot autofix a lockfile when running an immutable install`);
+  const [left, right] = getVariants(file);
+  let parsedLeft;
+  let parsedRight;
+
+  try {
+    parsedLeft = (0, _parsers.parseSyml)(left);
+    parsedRight = (0, _parsers.parseSyml)(right);
+  } catch (error) {
+    throw new _core.ReportError(_core.MessageName.AUTOMERGE_FAILED_TO_PARSE, `The individual variants of the lockfile failed to parse`);
+  }
+
+  const merged = { ...parsedLeft,
+    ...parsedRight
+  }; // Old-style lockfiles should be filtered out (for example when switching
+  // from a Yarn 2 branch to a Yarn 1 branch). Fortunately (?), they actually
+  // parse as valid YAML except that the objects become strings. We can use
+  // that to detect them. Damn, it's really ugly though.
+
+  for (const [key, value] of Object.entries(merged)) if (typeof value === `string`) delete merged[key];
+
+  await _fslib.xfs.changeFilePromise(lockfilePath, (0, _parsers.stringifySyml)(merged), {
+    automaticNewlines: true
+  });
+  return true;
+}
+
+function getVariants(file) {
+  const variants = [[], []];
+  const lines = file.split(/\r?\n/g);
+  let skip = false;
+
+  while (lines.length > 0) {
+    const line = lines.shift();
+    if (typeof line === `undefined`) throw new Error(`Assertion failed: Some lines should remain`);
+
+    if (line.startsWith(MERGE_CONFLICT_START)) {
+      // get the first variant
+      while (lines.length > 0) {
+        const conflictLine = lines.shift();
+        if (typeof conflictLine === `undefined`) throw new Error(`Assertion failed: Some lines should remain`);
+
+        if (conflictLine === MERGE_CONFLICT_SEP) {
+          skip = false;
+          break;
+        } else if (skip || conflictLine.startsWith(MERGE_CONFLICT_ANCESTOR)) {
+          skip = true;
+        } else {
+          variants[0].push(conflictLine);
+        }
+      } // get the second variant
+
+
+      while (lines.length > 0) {
+        const conflictLine = lines.shift();
+        if (typeof conflictLine === `undefined`) throw new Error(`Assertion failed: Some lines should remain`);
+
+        if (conflictLine.startsWith(MERGE_CONFLICT_END)) {
+          break;
+        } else {
+          variants[1].push(conflictLine);
+        }
+      }
+    } else {
+      variants[0].push(line);
+      variants[1].push(line);
+    }
+  }
+
+  return [variants[0].join(`\n`), variants[1].join(`\n`)];
+}
+
+/***/ }),
+
+/***/ "./plugin.ts":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _install = __webpack_require__("./commands/install.ts");
+
+const plugin = {
+  commands: [_install.BareInstallCommand]
+};
+var _default = plugin;
+exports.default = _default;
+
+/***/ }),
+
+/***/ "@yarnpkg/cli":
+/***/ (function(module, exports) {
+
+module.exports = __BERRY_REQUIRE__("@yarnpkg/cli");
+
+/***/ }),
+
+/***/ "@yarnpkg/core":
+/***/ (function(module, exports) {
+
+module.exports = __BERRY_REQUIRE__("@yarnpkg/core");
+
+/***/ }),
+
+/***/ "@yarnpkg/fslib":
+/***/ (function(module, exports) {
+
+module.exports = __BERRY_REQUIRE__("@yarnpkg/fslib");
+
+/***/ }),
+
+/***/ "@yarnpkg/parsers":
+/***/ (function(module, exports) {
+
+module.exports = __BERRY_REQUIRE__("@yarnpkg/parsers");
+
+/***/ }),
+
+/***/ "clipanion":
+/***/ (function(module, exports) {
+
+module.exports = __BERRY_REQUIRE__("clipanion");
+
+/***/ })
+
+/******/ });
+       return plugin;
+   }
+};
